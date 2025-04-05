@@ -27,3 +27,20 @@ export const sendResponse = <T>(
     };
     return res.status(statusCode).json(response);
 };
+
+
+/**
+ * Generates a random 6-character alphanumeric email verification code.
+ *
+ * @returns {string} A randomly generated string consisting of uppercase letters,
+ * lowercase letters, and digits.
+ */
+export const generateEmailVerifiactionCode = ()=>{
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < 6; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        result += characters[randomIndex];
+    }
+    return result;
+}
