@@ -5,7 +5,7 @@ export const zodValidator = (schema : ZodSchema<any>)=>(req : Request,res : Resp
     const result = schema.safeParse(req.body);
 
     if(!result.success) {
-       res.status(400).send({success : false, message : 'Data Validation Error'});
+       res.status(411).send({success : false, message : 'Data Validation Error'});
        return;
     }
     req.body = result.data;

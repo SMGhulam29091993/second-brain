@@ -1,6 +1,17 @@
 import { Response } from "express";
 import { ApiResponse } from "../dto/response.dto";
 
+/**
+ * Sends a standardized API response to the client.
+ *
+ * @template T - The type of the data being sent in the response.
+ * @param res - The Express `Response` object used to send the response.
+ * @param statusCode - The HTTP status code for the response.
+ * @param success - A boolean indicating whether the operation was successful.
+ * @param message - A message describing the result of the operation.
+ * @param data - Optional data to include in the response body. Defaults to `null` if not provided.
+ * @returns The Express `Response` object with the JSON response.
+ */
 export const sendResponse = <T>(
     res: Response, 
     statusCode: number, 
