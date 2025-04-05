@@ -35,7 +35,7 @@ export const sendResponse = <T>(
  * @returns {string} A randomly generated string consisting of uppercase letters,
  * lowercase letters, and digits.
  */
-export const generateEmailVerifiactionCode = ()=>{
+export const generateVerifiactionCode = ()=>{
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
     for (let i = 0; i < 6; i++) {

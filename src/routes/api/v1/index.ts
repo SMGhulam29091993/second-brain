@@ -1,10 +1,11 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import userRoutes from './user.routes';
+import { sendResponse } from '../../../lib/helper.function';
 const routes = express.Router();
 
 
-routes.get('/', (req,res):any=>{
-    return res.status(200).send({message : 'Welcome to the Second Brain API', success : true});
+routes.get('/', (req : Request,res : Response):any=>{
+    return sendResponse(res, 200, true, "Welcome to the API", null);
 });
 
 routes.use('/user', userRoutes );
