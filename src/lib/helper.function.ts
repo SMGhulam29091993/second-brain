@@ -1,5 +1,6 @@
 import { Response } from "express";
 import { ApiResponse } from "../dto/response.dto";
+import { error } from "winston";
 
 /**
  * Sends a standardized API response to the client.
@@ -17,13 +18,15 @@ export const sendResponse = <T>(
     statusCode: number, 
     success: boolean, 
     message: string, 
-    data?: T
+    data?: T | null,
+    error?: T | null
 ): Response => {
     const response: ApiResponse<T> = {
         statusCode,
         success,
         message,
         data: data ?? null, // Ensures `null` if data is undefined or missing
+        error: error ?? null, // Ensures `null` if error is undefined or missing
     };
     return res.status(statusCode).json(response);
 };
