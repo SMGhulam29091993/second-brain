@@ -20,7 +20,7 @@ export const userLoginSchema = z.object({
 
 export type userLoginInput = z.infer<typeof userLoginSchema>;
 
-
+//user dto
 export const userSchema = z.object({
     _id : z.string().optional(),
     username : z.string(),

@@ -71,6 +71,24 @@ export const registerUser = async (req: Request, res : Response, next : NextFunc
 }
 
 
+/**
+ * Handles the creation of a user session by authenticating the user and generating a token.
+ * 
+ * @param req - The HTTP request object containing user credentials in the body.
+ * @param res - The HTTP response object used to send responses back to the client.
+ * @param next - The next middleware function in the Express.js request-response cycle.
+ * 
+ * @returns A Promise that resolves to void. Sends appropriate HTTP responses based on the authentication process.
+ * 
+ * @throws Passes any unexpected errors to the next middleware for error handling.
+ * 
+ * Functionality:
+ * - Fetches the user from the database using the provided email.
+ * - Verifies the user's password using bcryptjs.
+ * - If the email is not verified, sends a verification email with a code and hash.
+ * - If authentication is successful, generates a token and sends it in the response.
+ * - Excludes the password from the user object in the response.
+ */
 export const createSession = async (req : Request, res : Response, next : NextFunction) : Promise<void> => {
     try {
         const fetchUser = await User.findOne({ email: req.body.email }).select("+password");
