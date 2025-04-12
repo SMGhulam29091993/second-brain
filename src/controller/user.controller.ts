@@ -6,6 +6,7 @@ import { createUserInput } from '../dto/user.dto';
 import { generateVerifiactionCode, sendResponse } from '../lib/helper.function';
 import { sendMail } from '../lib/nodemailer';
 import { config } from 'dotenv';
+import { createToken } from '../utils/features';
 
 config();
 
@@ -67,5 +68,35 @@ export const registerUser = async (req: Request, res : Response, next : NextFunc
     } catch (error) {
         next(error)
     }
+}
 
+
+export const createSession = async (req : Request, res : Response, next : NextFunction) : Promise<void> => {
+    try {
+        const fetchUser = await User.findOne({ email: req.body.email }).select("+password");
+        if(!fetchUser) {
+            sendResponse(res, 404, false, "User not found", null);
+            return;
+        }
+        const isValidPassword = await bcryptjs.compare(req.body.password, fetchUser.password);
+        if(!isValidPassword) {
+            sendResponse(res, 403, false, "Invalid Credentials", null);
+            return;
+        }
+
+        if(isValidPassword && !fetchUser.isEmailVerified) {
+
+            const verificationHash = await bcryptjs.hash(fetchUser.email, 10);
+            const code = await generateVerifiactionCode(); // Generate a random verification code
+
+            await sendMail(fetchUser.email, String(process.env.SMTP_USER), "Email Verification Code", `<h1>Welcome ${fetchUser.username}</h1><p>Please verify your email with the given code : ${code} "</p>`);
+            sendResponse(res, 200, true, "User Email not verified", verificationHash);
+            return;
+        }
+        const { password, ...user } = fetchUser.toObject(); // Exclude password from the response
+        await createToken(res, user, "Login successful");
+        return;
+    } catch (error) {
+        next(error)        
+    }
 }
