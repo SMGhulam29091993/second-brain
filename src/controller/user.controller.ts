@@ -1,11 +1,10 @@
 import bcryptjs from 'bcryptjs';
+import { config } from 'dotenv';
 import { NextFunction, Request, Response } from "express";
-import User from '../models/user.model';
-import { ApiResponse} from './../dto/response.dto';
 import { createUserInput } from '../dto/user.dto';
 import { generateVerifiactionCode, sendResponse } from '../lib/helper.function';
 import { sendMail } from '../lib/nodemailer';
-import { config } from 'dotenv';
+import User from '../models/user.model';
 import { createToken } from '../utils/features';
 
 config();
