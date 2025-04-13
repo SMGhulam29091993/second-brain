@@ -5,7 +5,8 @@ import { createUserInput } from '../dto/user.dto';
 import { generateVerifiactionCode, sendResponse } from '../lib/helper.function';
 import { sendMail } from '../lib/nodemailer';
 import User from '../models/user.model';
-import { createToken } from '../utils/features';
+import { createToken, validateToken } from '../utils/features';
+import { UserDto } from '../constants/types';
 
 config();
 
@@ -111,9 +112,62 @@ export const createSession = async (req : Request, res : Response, next : NextFu
             return;
         }
         const { password, ...user } = fetchUser.toObject(); // Exclude password from the response
-        await createToken(res, user, "Login successful");
+
+        const userData : UserDto={
+            _id : user._id.toString(),
+            username : user.username,
+            email : user.email,
+            isEmailVerified : user.isEmailVerified
+        }
+        await createToken(res, userData, "Login successful");
         return;
     } catch (error) {
         next(error)        
     }
 }
+
+/**
+ * Handles the refresh token functionality for user authentication.
+ * 
+ * @param req - The HTTP request object, which contains the cookies with the refresh token.
+ * @param res - The HTTP response object, used to send the response back to the client.
+ * @param next - The next middleware function in the Express.js request-response cycle.
+ * 
+ * @returns A Promise that resolves to void. Sends a response to the client with the refreshed token or an error message.
+ * 
+ * @throws Passes any unexpected errors to the next middleware for error handling.
+ * 
+ * The function performs the following steps:
+ * 1. Extracts the refresh token from the request cookies.
+ * 2. Validates the token and retrieves the associated user data.
+ * 3. Checks if the user exists in the database.
+ * 4. Constructs a `UserDto` object with the user's details.
+ * 5. Creates a new token and sends it back to the client.
+ * 6. Handles errors by passing them to the next middleware.
+ */
+export const refreshToken = async (req: Request, res : Response, next : NextFunction) : Promise<void>=>{
+    try {
+        const token = req.cookies['refresh-token'];
+        if(!token) {
+            sendResponse(res, 403, false, "Unauthorized Action/token", null);
+            return;
+        }
+        const data = await validateToken(token);
+        const userData = await User.findById({_id : data})
+        if(!userData) {
+            sendResponse(res, 403, false, "Unauthorized Action/token", null);
+            return;
+        }
+        const user : UserDto = {
+            _id : userData._id.toString(),
+            username : userData.username,
+            email : userData.email,
+            isEmailVerified : userData.isEmailVerified
+        }
+        await createToken(res, user, "Token refreshed successfully");
+        return;
+    } catch (error) {
+        next(error);
+    }
+}
+

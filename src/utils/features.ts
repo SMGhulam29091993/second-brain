@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { createUserInput } from './../dto/user.dto';
+import { UserDto } from '../constants/types';
 
 /**
  * Generates and sends a JWT token and refresh token to the client.
@@ -15,9 +16,9 @@ import { createUserInput } from './../dto/user.dto';
  * The function then sends a response containing the user data, the JWT token, and a 
  * success message.
  */
-export const createToken = (res : Response, user : Partial<createUserInput>, check : string) : void=>{
-    const token = jwt.sign({email : user.email}, String(process.env.JWT_SECRET), {expiresIn : "1h"});
-    const refreshToken = jwt.sign({email : user.email}, String(process.env.JWT_REFRESH_SECRET), {expiresIn : "7d"});
+export const  createToken = (res : Response, user : Partial<UserDto>, check : string) : void=>{
+    const token = jwt.sign({_id : user._id}, String(process.env.JWT_SECRET), {expiresIn : "1h"});
+    const refreshToken = jwt.sign({_id : user._id}, String(process.env.JWT_REFRESH_SECRET), {expiresIn : "7d"});
     
     res.status(200)
         .cookie("refresh-token", refreshToken,
@@ -45,6 +46,6 @@ export const validateToken = (refreshToken : string) =>{
         return null;
     }
 
-    const email = jwt.decode(refreshToken) as {email : string};
-    return email.email;
+    const userId = jwt.decode(refreshToken) as {_id : string};
+    return userId._id;
 }
