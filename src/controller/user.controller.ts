@@ -171,3 +171,11 @@ export const refreshToken = async (req: Request, res : Response, next : NextFunc
     }
 }
 
+export const verifyEmail = async (req : Request, res : Response, next : NextFunction) : Promise<void> => {
+    try {
+        
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+}
