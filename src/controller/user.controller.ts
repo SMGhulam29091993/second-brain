@@ -7,6 +7,8 @@ import { sendMail } from '../lib/nodemailer';
 import User from '../models/user.model';
 import { createToken, validateToken } from '../utils/features';
 import { UserDto } from '../constants/types';
+import Otp from '../models/otp.model';
+import { create } from 'ts-node';
 
 config();
 
@@ -61,9 +63,16 @@ export const registerUser = async (req: Request, res : Response, next : NextFunc
         }
 
         let code = await generateVerifiactionCode(); // Generate a random verification code
-
+        const codeAndHashStore = await Otp.create({
+            userId: registerUser._id,
+            hashedCode: verificationHash,
+            code: code,
+        });
+        if(!codeAndHashStore) {
+            sendResponse(res, 400, false, "Code not created", null);
+        }
         await sendMail(user.email, String(process.env.SMTP_USER), "Email Verification Code", `<h1>Welcome ${user.username}</h1><p>Please verify your email with the given code : ${code} "</p>`);
-        sendResponse(res, 201, true, "User created successfully", verificationHash);
+        sendResponse(res, 201, true, "User created successfully", {hashedCode : verificationHash});
         return;
     } catch (error) {
         next(error)
@@ -85,7 +94,7 @@ export const registerUser = async (req: Request, res : Response, next : NextFunc
  * Functionality:
  * - Fetches the user from the database using the provided email.
  * - Verifies the user's password using bcryptjs.
- * - If the email is not verified, sends a verification email with a code and hash.
+ * - If the email is not verified, sends a verification email with a code and hash first it will delete the old code & hash if exist.
  * - If authentication is successful, generates a token and sends it in the response.
  * - Excludes the password from the user object in the response.
  */
@@ -103,7 +112,10 @@ export const createSession = async (req : Request, res : Response, next : NextFu
         }
 
         if(isValidPassword && !fetchUser.isEmailVerified) {
-
+            const existHashedCode = await Otp.findOne({ userId: fetchUser._id });
+            if(existHashedCode) {
+                await Otp.deleteOne({ userId: fetchUser._id });
+            }
             const verificationHash = await bcryptjs.hash(fetchUser.email, 10);
             const code = await generateVerifiactionCode(); // Generate a random verification code
 
@@ -171,8 +183,60 @@ export const refreshToken = async (req: Request, res : Response, next : NextFunc
     }
 }
 
+/**
+ * Verifies the user's email by validating the provided OTP code.
+ * 
+ * @param req - The HTTP request object containing the hashed OTP code in `params` 
+ *              and the plain OTP code in the request body.
+ * @param res - The HTTP response object used to send the response back to the client.
+ * @param next - The next middleware function in the Express.js request-response cycle.
+ * 
+ * @throws Will pass any unexpected errors to the next middleware.
+ * 
+ * The function performs the following steps:
+ * 1. Retrieves the hashed OTP code from the request parameters and the plain OTP code from the request body.
+ * 2. Searches for the OTP data in the database using the hashed code.
+ * 3. If no OTP data is found, sends a 403 response with an "Invalid code" message.
+ * 4. Fetches the user associated with the OTP data using the user ID.
+ * 5. If no user is found, sends a 403 response with an "Invalid code" message.
+ * 6. Compares the provided OTP code with the stored OTP code.
+ * 7. If the codes do not match, sends a 403 response with an "Invalid code" message.
+ * 8. Marks the user's email as verified and saves the user data.
+ * 9. Deletes the OTP data associated with the user.
+ * 10. Creates a token for the user and sends a success response with the token.
+ */
 export const verifyEmail = async (req : Request, res : Response, next : NextFunction) : Promise<void> => {
     try {
+        const hashedCode = req.params.hashedCode;
+        const code = req.body.code;
+        const otpData = await Otp.findOne({ hashedCode: hashedCode });
+        if(!otpData) {
+            sendResponse(res, 403, false, "Invalid code", null);
+            return;
+        }
+        const fetchUser = await User.findById(otpData.userId);
+        if(!fetchUser) {
+            sendResponse(res, 403, false, "Invalid code", null);
+            return;
+        }
+        if(otpData.code !== code) {
+            sendResponse(res, 403, false, "Invalid code", null);
+            return;
+        }
+        fetchUser.isEmailVerified = true;
+        await fetchUser.save();
+
+        await Otp.deleteOne({ userId: fetchUser._id });
+
+
+        let userTokenData : UserDto = {
+            _id : fetchUser._id.toString(),
+            username : fetchUser.username,
+            email : fetchUser.email,
+            isEmailVerified : fetchUser.isEmailVerified
+        }
+        await createToken(res, userTokenData, "Email verified successfully");
+        return;        
         
     } catch (error) {
         console.error(error);
