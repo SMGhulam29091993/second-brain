@@ -1,12 +1,11 @@
-import express from 'express';
 import * as colors from 'colors';
-import dotenv from 'dotenv';
-import db from './config/mongoose';
-import * as cors from 'cors';
-import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
-import routes from './routes/api/v1/index';
+import dotenv from 'dotenv';
+import express from 'express';
+import morgan from 'morgan';
+import db from './config/mongoose';
 import { errorHandlerMiddleware } from './middleware/errorHandler';
+import routes from './routes/api/v1/index';
 
 dotenv.config();
 

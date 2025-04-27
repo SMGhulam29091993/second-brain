@@ -7,3 +7,6 @@ import { createContentSchema } from '../../../dto/content.dto';
 const routes = express.Router();
 
 routes.post('/add-content', zodValidator(createContentSchema), AuthMiddleware ,addContent);
+
+
+export default routes;
