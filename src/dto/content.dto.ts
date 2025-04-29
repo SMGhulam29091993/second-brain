@@ -22,6 +22,7 @@ export const createContentSchema = z.object({
         message: "User not found",
     }),
 })
+export type createContentInput = z.infer<typeof createContentSchema>;
 
 export const contentDto = z.object({
     link : z.string().url("Invalid URL"),
@@ -47,3 +48,5 @@ export const contentDto = z.object({
     _id : z.string().optional(),
     __v : z.number().optional(),
 });
+
+export type contentDtoType = z.infer<typeof contentDto>;
