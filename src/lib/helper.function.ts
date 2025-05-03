@@ -47,3 +47,19 @@ export const generateVerifiactionCode = ()=>{
     }
     return result;
 }
+
+/**
+ * Capitalizes the first letter of each word in a given string.
+ *
+ * @param input - The input string to be transformed.
+ * @returns A new string with the first letter of each word capitalized.
+ *
+ * @example
+ * ```typescript
+ * const result = capitalizeFirstLetter("hello world");
+ * console.log(result); // Output: "Hello World"
+ * ```
+ */
+export const capitalizeFirstLetter = (input: string) => {
+    return input.toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+}
