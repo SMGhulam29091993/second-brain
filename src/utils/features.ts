@@ -32,20 +32,20 @@ export const  createToken = (res : Response, user : Partial<UserDto>, check : st
     return;
 }
 
+
+
 /**
- * Validates a given refresh token and extracts the email address if valid.
+ * Validates a given refresh token using the JWT secret.
  *
- * @param refreshToken - The refresh token to validate.
- * @returns The email address extracted from the token if valid, or `null` if the token is invalid.
+ * @param refreshToken - The refresh token to be validated.
+ * @returns The `_id` extracted from the token if valid, or `null` if the token is invalid.
  *
- * @throws Will throw an error if the token verification fails due to an invalid secret or malformed token.
+ * @throws Will throw an error if the token verification fails due to an invalid or malformed token.
  */
 export const validateToken = (refreshToken : string) =>{
-    const isValideRefreshToken = jwt.verify(refreshToken, String(process.env.JWT_REFRESH_SECRET));
+    const isValideRefreshToken = jwt.verify(refreshToken, String(process.env.JWT_REFRESH_SECRET)) as {_id : string};
     if(!isValideRefreshToken) {
         return null;
     }
-
-    const userId = jwt.decode(refreshToken) as {_id : string};
-    return userId._id;
+    return isValideRefreshToken._id;
 }
