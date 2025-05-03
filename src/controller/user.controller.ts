@@ -161,13 +161,13 @@ export const refreshToken = async (req: Request, res : Response, next : NextFunc
     try {
         const token = req.cookies['refresh-token'];
         if(!token) {
-            sendResponse(res, 403, false, "Unauthorized Action/token", null);
+            sendResponse(res, 403, false, "Unauthorized Action", null);
             return;
         }
         const data = await validateToken(token);
         const userData = await User.findById({_id : data})
         if(!userData) {
-            sendResponse(res, 403, false, "Unauthorized Action/token", null);
+            sendResponse(res, 403, false, "Unauthorized Action", null);
             return;
         }
         const user : UserDto = {
