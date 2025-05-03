@@ -1,5 +1,6 @@
 import {z} from "zod";
 import User from "../models/user.model";
+import Content from "../models/content.model";
 
 export const createLinkSchema = z.object({
     hash : z.string().min(7, "Hash is required"),
@@ -11,7 +12,7 @@ export const createLinkSchema = z.object({
         message: "User not found",
     }),
     contentId : z.string().refine(async (contentId)=>{
-        const content = await User.findById(contentId);
+        const content = await Content.findById(contentId);
         return content !== null;
     }
     , {
@@ -31,7 +32,7 @@ export const linkDto = z.object({
         message: "User not found",
     }),
     contentId : z.string().refine(async (contentId)=>{
-        const content = await User.findById(contentId);
+        const content = await Content.findById(contentId);
         return content !== null;
     }
     , {
