@@ -10,6 +10,13 @@ export const createLinkSchema = z.object({
     {
         message: "User not found",
     }),
+    contentId : z.string().refine(async (contentId)=>{
+        const content = await User.findById(contentId);
+        return content !== null;
+    }
+    , {
+        message: "Content not found",
+    }).optional(),
 });
 
 export type createLinkInput = z.infer<typeof createLinkSchema>;
@@ -23,6 +30,13 @@ export const linkDto = z.object({
     , { 
         message: "User not found",
     }),
+    contentId : z.string().refine(async (contentId)=>{
+        const content = await User.findById(contentId);
+        return content !== null;
+    }
+    , {
+        message: "Content not found",
+    }).optional(),
     createdAt : z.date().optional(),
     updatedAt : z.date().optional(),
     _id : z.string().optional(),
