@@ -2,6 +2,8 @@ import { z } from "zod";
 import Tag from "../models/tag.model";
 import User from "../models/user.model";
 
+
+/// This DTO is used to validate the content data before it is saved to the database.
 export const createContentSchema = z.object({
     link : z.string().url("Invalid URL"),
     type : z.enum(['video', 'image', 'audio', 'article']).refine(value => value !== undefined, {
@@ -24,6 +26,8 @@ export const createContentSchema = z.object({
 })
 export type createContentInput = z.infer<typeof createContentSchema>;
 
+
+//contentDto is used to validate the content data before sending it to the client
 export const contentDto = z.object({
     link : z.string().url("Invalid URL"),
     type : z.enum(['video', 'image', 'audio', 'article']).refine(value => value !== undefined, {
