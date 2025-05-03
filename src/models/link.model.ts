@@ -12,7 +12,7 @@ const linkSchema = new mongoose.Schema({
         ref : "User",
         required : true,
     },
-    constentId : {
+    contentId : {
         type : mongoose.Schema.Types.ObjectId,
         ref : "Content",
         required : false,
