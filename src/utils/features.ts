@@ -1,6 +1,5 @@
 import { Response } from 'express';
 import * as jwt from 'jsonwebtoken';
-import { createUserInput } from './../dto/user.dto';
 import { UserDto } from '../constants/types';
 
 /**
