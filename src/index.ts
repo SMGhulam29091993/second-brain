@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import db from './config/mongoose';
 import { errorHandlerMiddleware } from './middleware/errorHandler';
 import routes from './routes/api/v1/index';
+import cors from 'cors';
 
 dotenv.config();
 
@@ -13,6 +14,18 @@ const app = express();
 const PORT = 3001
 db; // Initialize the database connection
 
+
+const allowedOrigins = ['http://localhost:5173', process.env.FRONTEND_URL];
+const corsOptions = {
+    origin : (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+        if(allowedOrigins.indexOf(origin) !== -1 || !origin){
+            callback(null,true);
+        }else{
+            callback(new Error("Not allowed by CORS"))
+        }
+    }
+}
+app.use(cors(corsOptions));
 
 app.use(morgan('dev'));
 app.use(express.json());
