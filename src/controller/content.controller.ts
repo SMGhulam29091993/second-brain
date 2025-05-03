@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import Content from "../models/content.model";
 import { sendResponse } from "../lib/helper.function";
+import Content from "../models/content.model";
 
 /**
  * Adds new content to the database.
@@ -23,7 +23,7 @@ export const addContent = async (req : Request, res : Response, next : NextFunct
     try {
         const { link, type, title, tags } = req.body;
         const userId = req.userId;
-
+        
         //saving the content to the database
         const content = await Content.create({ link, type, title, tags, userId });
 
