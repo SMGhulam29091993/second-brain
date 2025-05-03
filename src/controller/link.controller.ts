@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import { nanoid } from 'nanoid';
 import { createLinkInput } from "../dto/link.dto";
 import { sendResponse } from '../lib/helper.function';
 import Link from "../models/link.model";
@@ -36,6 +35,7 @@ export const createLink = async (req : Request, res : Response, next : NextFunct
             throw new Error("User ID is undefined");
         }
 
+        const {nanoid} = await import('nanoid'); 
         const hash = nanoid(10);
 
         const createLink : createLinkInput = {
