@@ -1,14 +1,13 @@
 import bcryptjs from 'bcryptjs';
 import { config } from 'dotenv';
 import { NextFunction, Request, Response } from "express";
+import { UserDto } from '../constants/types';
 import { createUserInput } from '../dto/user.dto';
 import { generateVerifiactionCode, sendResponse } from '../lib/helper.function';
 import { sendMail } from '../lib/nodemailer';
+import Otp from '../models/otp.model';
 import User from '../models/user.model';
 import { createToken, validateToken } from '../utils/features';
-import { UserDto } from '../constants/types';
-import Otp from '../models/otp.model';
-import { create } from 'ts-node';
 
 config();
 
@@ -240,6 +239,35 @@ export const verifyEmail = async (req : Request, res : Response, next : NextFunc
         
     } catch (error) {
         console.error(error);
+        next(error);
+    }
+}
+
+/**
+ * Handles the destruction of a user session by clearing the "refresh-token" cookie.
+ *
+ * @param req - The HTTP request object.
+ * @param res - The HTTP response object.
+ * @param next - The next middleware function in the stack.
+ * @returns A promise that resolves to void.
+ *
+ * @remarks
+ * - The "refresh-token" cookie is cleared with specific options:
+ *   - `httpOnly`: Ensures the cookie is only accessible via HTTP(S) requests.
+ *   - `secure`: Sets the cookie to be sent only over HTTPS in production.
+ *   - `sameSite`: Configures the cookie's SameSite attribute based on the environment.
+ * - Sends a response with a success message upon successful logout.
+ * - Passes any errors to the next middleware using the `next` function.
+ */
+export const destroySession = async (req : Request, res : Response, next : NextFunction) : Promise<void> => {
+    try {
+        res.status(200).clearCookie("refresh-token",{
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production'? true : false,
+            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
+        }).send({statusCode : 200, success: true, message : "Logout successful", data : null});
+        return;
+    } catch (error) {
         next(error);
     }
 }
