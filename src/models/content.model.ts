@@ -8,13 +8,10 @@ export enum ContentType {
 }
 
 export enum ContentSource {
+  NONE = "none",
   YOUTUBE = "youtube",
-  VIMEO = "vimeo",
-  SPOTIFY = "spotify",
-  SOUNDCLOUD = "soundcloud",
   TWITTER = "twitter",
   FACEBOOK = "facebook",
-  LINKEDIN = "linkedin",
   GITHUB = "github",
 }
 
