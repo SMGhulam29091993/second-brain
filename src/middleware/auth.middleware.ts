@@ -28,16 +28,24 @@ export const AuthMiddleware = (
   next: NextFunction
 ): void => {
   try {
-    const token = req.cookies["token"];
-    if (!token) {
-      sendResponse(res, 401, false, "You are unauthorized", null);
+    const authHeader =
+      req.headers["authorization"] || req.headers["Authorization"];
+    const headerToken =
+      typeof authHeader === "string" && authHeader.startsWith("Bearer ")
+        ? authHeader.split(" ")[1]
+        : undefined;
+
+    if (!headerToken) {
+      sendResponse(res, 401, false, "Unauthorized", null);
       return;
     }
-    const decodedUser = jwt.verify(token, process.env.JWT_SECRET as string) as {
-      _id: string;
-    };
+    const decodedUser = jwt.verify(
+      headerToken,
+      process.env.JWT_SECRET as string
+    ) as { _id: string };
     req.userId = decodedUser._id;
     next();
+    return;
   } catch (error) {
     next(error);
   }
