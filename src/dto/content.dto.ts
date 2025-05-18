@@ -6,42 +6,26 @@ import User from "../models/user.model";
 export const createContentSchema = z.object({
   link: z.string().url("Invalid URL"),
   type: z
-    .enum(["video", "image", "audio", "article"])
+    .enum(["video", "image", "audio", "article", "repository"])
     .refine((value) => value !== undefined, {
       message: "Invalid content type",
     }),
   title: z.string().min(3, "Title is required"),
-  tags: z.array(
-    z.string().refine(
-      async (tagId) => {
-        const tag = await Tag.findById(tagId);
-        return tag !== null;
-      },
-      {
-        message: "Tag not found",
-      }
+  tags: z
+    .array(
+      z.string().refine(
+        async (tagId) => {
+          const tag = await Tag.findById(tagId);
+          return tag !== null;
+        },
+        {
+          message: "Tag not found",
+        }
+      )
     )
-  ),
-  userId: z.string().refine(
-    async (userId) => {
-      const user = await User.findById(userId);
-      return user !== null;
-    },
-    {
-      message: "User not found",
-    }
-  ),
+    .optional(),
   source: z
-    .enum([
-      "youtube",
-      "vimeo",
-      "spotify",
-      "soundcloud",
-      "twitter",
-      "facebook",
-      "linkedin",
-      "github",
-    ])
+    .enum(["youtube", "twitter", "facebook", "github"])
     .refine((value) => value !== undefined, {
       message: "Invalid content source",
     }),
@@ -52,7 +36,7 @@ export type createContentInput = z.infer<typeof createContentSchema>;
 export const contentDto = z.object({
   link: z.string().url("Invalid URL"),
   type: z
-    .enum(["video", "image", "audio", "article"])
+    .enum(["video", "image", "audio", "article", "repository"])
     .refine((value) => value !== undefined, {
       message: "Invalid content type",
     }),
@@ -78,16 +62,7 @@ export const contentDto = z.object({
     }
   ),
   source: z
-    .enum([
-      "youtube",
-      "vimeo",
-      "spotify",
-      "soundcloud",
-      "twitter",
-      "facebook",
-      "linkedin",
-      "github",
-    ])
+    .enum(["youtube", "twitter", "facebook", "github"])
     .refine((value) => value !== undefined, {
       message: "Invalid content source",
     }),

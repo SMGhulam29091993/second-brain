@@ -5,6 +5,7 @@ export enum ContentType {
   IMAGE = "image",
   AUDIO = "audio",
   Article = "article",
+  REPOSITORY = "repository",
 }
 
 export enum ContentSource {
