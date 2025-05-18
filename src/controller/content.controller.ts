@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { sendResponse } from "../lib/helper.function";
 import Content from "../models/content.model";
 import { addContentSource } from "../services/content.service";
+import Source from "../models/source.model";
 
 /**
  * Adds new content to the database for the authenticated user.
@@ -38,7 +39,10 @@ export const addContent = async (
       return;
     }
     if (source) {
-      await addContentSource(source);
+      const existSource = await Source.findOne({ name: source });
+      if (!existSource) {
+        await addContentSource(source);
+      }
     }
 
     //saving the content to the databaseO
