@@ -12,10 +12,6 @@ import Source from "../models/source.model";
  */
 export const addContentSource = async (source: string) => {
   try {
-    const existSource = await Source.findOne({ name: source });
-    if (existSource) {
-      throw new Error("Content source already exists");
-    }
     const addSource = await Source.create({ name: source });
     if (!addSource) {
       throw new Error("Failed to add content source");
