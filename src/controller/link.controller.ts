@@ -64,7 +64,7 @@ export const createLink = async (
 };
 
 // Helper function to generate random hash
-const generateHash = (length: number = 10): string => {
+export const generateHash = (length: number = 10): string => {
   return randomBytes(Math.ceil((length * 3) / 4))
     .toString("base64")
     .slice(0, length)
