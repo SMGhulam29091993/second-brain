@@ -172,17 +172,36 @@ export const getBrainLink = async (
       return;
     }
 
-    const content = await Content.findOne({
-      $or: [{ _id: link.contentId }, { userId: link.userId }],
-    });
+    const pageNumber = parseInt(req.query?.pageNumber as string) || 1;
+    const pageSize = parseInt(req.query?.pageSize as string) || 10;
+
+    const skip = (pageNumber - 1) * pageSize;
+    const limit = pageSize;
+
+    const filter = req.query?.source
+      ? { userId: link.userId._id, source: req.query.source }
+      : { userId: link.userId._id };
+
+    const content = await Content.find(filter)
+      .populate("userId", "username")
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const contentCount = await Content.countDocuments(filter);
+
     if (!content) {
-      sendResponse(res, 411, false, "No Content To Show", null);
+      sendResponse(res, 411, false, "No Content To Show", {
+        count: contentCount,
+        content: null,
+      });
       return;
     }
 
     sendResponse(res, 200, true, "Here is your content", {
       username: link.userId.username,
       content,
+      count: contentCount,
     });
     return;
   } catch (error) {
