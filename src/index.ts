@@ -11,7 +11,7 @@ import cors from "cors";
 dotenv.config();
 
 const app = express();
-const PORT = 3001;
+const PORT = 3002;
 db; // Initialize the database connection
 
 /**
@@ -25,7 +25,11 @@ db; // Initialize the database connection
  * @constant
  * @type {string[]}
  */
-const allowedOrigins = ["http://localhost:5173", process.env.FRONTEND_URL];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  process.env.FRONTEND_URL,
+];
 
 /**
  * Configuration options for CORS (Cross-Origin Resource Sharing).
