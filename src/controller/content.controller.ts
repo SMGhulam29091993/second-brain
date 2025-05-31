@@ -87,12 +87,23 @@ export const getAllContent = async (
 ): Promise<void> => {
   try {
     const userId = req.userId;
+    let pageNumber = parseInt(req.query?.pageNumber as string) || 1;
+    let pageSize = parseInt(req.query?.pageSize as string) || 10;
 
-    const fetchAllContent = await Content.find({ userId })
+    let skip = (pageNumber - 1) * pageSize;
+    let limit = pageSize;
+
+    let filter = req.query?.source
+      ? { userId, source: req.query.source }
+      : { userId };
+
+    const fetchAllContent = await Content.find(filter)
       .populate("userId", "username")
+      .skip(skip)
+      .limit(limit)
       .sort({ createdAt: -1 });
 
-    const contentCount = await Content.countDocuments({ userId });
+    const contentCount = await Content.countDocuments(filter);
 
     if (!fetchAllContent)
       sendResponse(res, 200, false, "Content not found", {
@@ -145,6 +156,25 @@ export const deleteContent = async (
     sendResponse(res, 200, true, "Content deleted successfully", null);
     return;
   } catch (error) {
+    next(error);
+  }
+};
+
+export const getAllSources = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const sources = await Source.find();
+    if (!sources || sources.length === 0) {
+      sendResponse(res, 404, false, "No sources found", null);
+      return;
+    }
+    sendResponse(res, 200, true, "Sources fetched successfully", sources);
+    return;
+  } catch (error) {
+    console.error(error);
     next(error);
   }
 };
