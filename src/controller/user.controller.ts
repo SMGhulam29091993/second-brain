@@ -133,7 +133,7 @@ export const createSession = async (
       if (existHashedCode) {
         await Otp.deleteOne({ userId: fetchUser._id });
       }
-      const verificationHash = await bcryptjs.hash(fetchUser.email, 10);
+      const verificationHash = await generateHash(10); // Generate a new verification hash
       const code = await generateVerifiactionCode(); // Generate a random verification code
 
       await sendMail(
@@ -255,6 +255,10 @@ export const verifyEmail = async (
     }
     fetchUser.isEmailVerified = true;
     await fetchUser.save();
+    console.log(
+      "Email verified successfully for user:",
+      fetchUser.isEmailVerified
+    );
 
     await Otp.deleteOne({ userId: fetchUser._id });
 
