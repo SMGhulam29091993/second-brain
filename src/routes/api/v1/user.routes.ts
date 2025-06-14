@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createSession,
+  destroySession,
   refreshToken,
   registerUser,
   verifyEmail,
@@ -14,5 +15,6 @@ routes.post("/register", zodValidator(createUserSchema), registerUser);
 routes.post("/login", zodValidator(userLoginSchema), createSession);
 routes.post("/verify/:hashedCode", verifyEmail);
 routes.get("/refresh-token", refreshToken);
+routes.post("/logout", destroySession);
 
 export default routes;
