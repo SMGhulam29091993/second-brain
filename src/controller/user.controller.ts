@@ -316,3 +316,80 @@ export const destroySession = async (
     next(error);
   }
 };
+
+export const forgotPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      sendResponse(res, 404, false, "Please enter a valid email", null);
+      return;
+    }
+    const generateResetLink = `${process.env.FRONTEND_BASE_URL}/reset-password/${user._id}`;
+    await sendMail(
+      user.email,
+      String(process.env.SMTP_USER),
+      "Reset Password",
+      `<h1>Dear ${user.username}, <br></br></h1><p>Please reset your password using the following link: <a href="${generateResetLink}">Reset Password</a></p>`
+    );
+    sendResponse(
+      res,
+      200,
+      true,
+      "Password reset link sent to your email",
+      null
+    );
+    return;
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const resetPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { userId } = req.params;
+    const { password } = req.body;
+
+    console.log("userId:", userId, "newPassword:", password);
+
+    const userData = await User.findById(userId).select("+password");
+
+    if (!userData) {
+      sendResponse(res, 404, false, "User not found", null);
+      return;
+    }
+    console.log("User data found:", JSON.stringify(userData));
+
+    const isSameOldPassword = await bcryptjs.compare(
+      password,
+      userData.password
+    );
+
+    if (isSameOldPassword) {
+      sendResponse(
+        res,
+        400,
+        false,
+        "New password cannot be the same as the old password",
+        null
+      );
+      return;
+    }
+
+    const hashedPassword = await bcryptjs.hash(password, 10);
+    userData.password = hashedPassword;
+    await userData.save();
+    sendResponse(res, 200, true, "Password reset successfully", null);
+    return;
+  } catch (error) {
+    next(error);
+  }
+};
