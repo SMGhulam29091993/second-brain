@@ -66,6 +66,7 @@ export const contentDto = z.object({
     .refine((value) => value !== undefined, {
       message: "Invalid content source",
     }),
+  summary: z.string().optional(),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
   _id: z.string().optional(),

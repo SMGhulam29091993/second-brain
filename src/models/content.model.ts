@@ -45,6 +45,9 @@ const contentSchema = new mongoose.Schema(
       enum: ContentSource,
       required: true,
     },
+    summary: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
