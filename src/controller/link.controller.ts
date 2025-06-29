@@ -42,8 +42,7 @@ export const createLink = async (
       throw new Error("User ID is undefined");
     }
 
-    const { nanoid } = await import("nanoid");
-    const hash = nanoid(10);
+    const hash = generateHash(10);
 
     const createLink: createLinkInput = {
       hash,
@@ -80,10 +79,8 @@ export const createBrainLink = async (
 ): Promise<void> => {
   try {
     const userId = req.userId as string;
-    console.log("User ID:", userId);
 
     const shareBrain = req.body.shareBrain as boolean;
-    console.log("Share Brain:", shareBrain);
 
     if (shareBrain) {
       console.log("Creating or retrieving brain link for user:", userId);
@@ -92,10 +89,8 @@ export const createBrainLink = async (
         userId,
         contentId: { $exists: false },
       });
-      console.log("Existing link:", existLink);
 
       const baseUrl = process.env.FRONTEND_BASE_URL as string;
-      console.log("Base URL:", baseUrl);
 
       if (existLink) {
         console.log("Existing link found:", existLink);
@@ -202,6 +197,107 @@ export const getBrainLink = async (
       username: link.userId.username,
       content,
       count: contentCount,
+    });
+    return;
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createSummaryLink = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const contentId = req.params.contentId;
+    if (!contentId) {
+      sendResponse(res, 400, false, "Content ID is required", null);
+      return;
+    }
+    const existingLink = await Link.findOne({
+      contentId,
+      userId: req.userId,
+    });
+    if (existingLink) {
+      sendResponse(res, 200, true, "Link already exists", {
+        link: `${process.env.FRONTEND_BASE_URL}/shared-summary/${existingLink.hash}`,
+      });
+      return;
+    }
+    const userId = req.userId as string;
+    if (!userId) {
+      throw new Error("User ID is undefined");
+    }
+
+    const hash = generateHash(10);
+
+    const createLink: createLinkInput = {
+      hash,
+      userId,
+      contentId,
+    };
+    const link = await Link.create(createLink);
+
+    if (!link) {
+      sendResponse(res, 400, false, "Link not created", null);
+      return;
+    }
+
+    const baseUrl = process.env.FRONTEND_BASE_URL as string;
+    const summaryLinkUrl = `${baseUrl}/shared-summary/${link.hash}`;
+
+    sendResponse(res, 201, true, "Summary link created successfully", {
+      link: summaryLinkUrl,
+    });
+    return;
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getSummaryLink = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const hash = req.params.hash as string;
+    const link = await Link.findOne({ hash });
+
+    if (!link) {
+      sendResponse(res, 411, false, "Sorry Wrong Url!!!", null);
+      return;
+    }
+
+    if (!link.contentId) {
+      sendResponse(
+        res,
+        411,
+        false,
+        "This link does not point to a summary",
+        null
+      );
+      return;
+    }
+
+    const content = await Content.findById(link.contentId);
+
+    if (!content) {
+      sendResponse(res, 411, false, "No Content To Show", null);
+      return;
+    }
+
+    sendResponse(res, 200, true, "Here is your summary", {
+      summary: content.summary,
+      title: content.title,
+      link: content.link,
+      contentId: content._id,
+      userId: content.userId,
+      createdAt: content.createdAt,
+      source: content.source,
+      type: content.type,
+      tags: content.tags,
     });
     return;
   } catch (error) {
