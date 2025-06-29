@@ -5,6 +5,7 @@ import {
   deleteContent,
   getAllContent,
   getAllSources,
+  getContentSummary,
 } from "../../../controller/content.controller";
 import { AuthMiddleware } from "../../../middleware/auth.middleware";
 import { createContentSchema } from "../../../dto/content.dto";
@@ -20,5 +21,6 @@ routes.post(
 routes.get("/get-all-content", AuthMiddleware, getAllContent);
 routes.delete("/delete-content", AuthMiddleware, deleteContent);
 routes.get("/get-all-sources", getAllSources);
+routes.get("/summary/:contentId", getContentSummary);
 
 export default routes;
