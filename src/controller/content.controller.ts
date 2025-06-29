@@ -3,6 +3,7 @@ import { sendResponse } from "../lib/helper.function";
 import Content from "../models/content.model";
 import { addContentSource } from "../services/content.service";
 import Source from "../models/source.model";
+import { generateSummary } from "../services/ai.service";
 
 /**
  * Adds new content to the database for the authenticated user.
@@ -55,7 +56,22 @@ export const addContent = async (
       source,
     });
 
-    if (!content) sendResponse(res, 400, false, "Content not created", null);
+    if (!content) {
+      sendResponse(res, 400, false, "Content not created", null);
+      return;
+    }
+
+    if (source) {
+      try {
+        const summary = await generateSummary(source, link);
+        console.log("Generated Summary:", summary);
+
+        content.summary = summary;
+        await content.save();
+      } catch (error) {
+        console.error("Error generating summary:", error);
+      }
+    }
 
     sendResponse(res, 200, true, "Content created successfully", content);
     return;
@@ -175,6 +191,37 @@ export const getAllSources = async (
     return;
   } catch (error) {
     console.error(error);
+    next(error);
+  }
+};
+
+export const getContentSummary = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { contentId } = req.params;
+
+    const content = await Content.findById(contentId);
+
+    if (!content) {
+      sendResponse(res, 404, false, "Content not found", null);
+      return;
+    }
+    console.log("Content Summary:", content.summary);
+
+    sendResponse(res, 200, true, "Content summary fetched successfully", {
+      summary: content.summary,
+      title: content.title,
+      link: content.link,
+      source: content.source,
+      type: content.type,
+      tags: content.tags,
+      createdAt: content.createdAt,
+    });
+    return;
+  } catch (error) {
     next(error);
   }
 };
