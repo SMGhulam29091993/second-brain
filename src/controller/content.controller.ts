@@ -46,7 +46,17 @@ export const addContent = async (
       }
     }
 
-    //saving the content to the databaseO
+    // Check if the user has already added this link
+    const existingContentForUser = await Content.findOne({ link, userId });
+    if (existingContentForUser) {
+      sendResponse(res, 409, false, "Content already exists for this user", existingContentForUser);
+      return;
+    }
+
+    // Check if content with the same link already exists and has a summary
+    const existingContentWithSummary = await Content.findOne({ link, summary: { $exists: true, $ne: "" } });
+
+    //saving the content to the database
     const content = await Content.create({
       link,
       type,
@@ -61,7 +71,11 @@ export const addContent = async (
       return;
     }
 
-    if (source) {
+    if (existingContentWithSummary?.summary) {
+      console.log("Reusing existing summary");
+      content.summary = existingContentWithSummary.summary;
+      await content.save();
+    } else if (source) {
       try {
         const summary = await generateSummary(source, link);
         console.log("Generated Summary:", summary);
