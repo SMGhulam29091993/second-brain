@@ -76,20 +76,33 @@ To run this project locally, you will need to have Node.js and MongoDB installed
     `
     The server will start on port 3002.
 
+5.  **Run the production server:**
+    ```bash
+    npm run start:prod
+    ```
+
 ## 6. API Endpoints
 
 The API routes are defined in the `src/routes/api/v1` directory.
 
-- **User Routes (`/api/v1/user`):**
+- **User Routes (`/api/v1/user`):
   - `POST /register`: Register a new user.
   - `POST /login`: Log in a user.
   - `POST /logout`: Log out a user.
   - `GET /refresh-token`: Refresh the authentication token.
   - `POST /verify/:hashedCode`: Verify a user's email.
-- **Content Routes (`/api/v1/content`):**
+- **Content Routes (`/api/v1/content`):
   - `POST /add-content`: Add new content.
   - `GET /get-all-content`: Get all content for the authenticated user.
   - `DELETE /delete-content`: Delete a content item.
-- **Link Routes (`/api/v1/link`):**
+- **Link Routes (`/api/v1/link`):
   - `POST /create-link/:contentId`: Create a shareable link for a content item.
   - `GET /brain/:hash`: Access a user's "brain" (all their content) via a shareable link.
+
+## 7. Author
+
+S M Ghulam Ghaus Faiyaz
+
+## 8. License
+
+ISC License
