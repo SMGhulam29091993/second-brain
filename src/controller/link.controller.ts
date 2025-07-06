@@ -83,8 +83,6 @@ export const createBrainLink = async (
     const shareBrain = req.body.shareBrain as boolean;
 
     if (shareBrain) {
-      console.log("Creating or retrieving brain link for user:", userId);
-
       const existLink = await Link.findOne({
         userId,
         contentId: { $exists: false },
@@ -93,8 +91,6 @@ export const createBrainLink = async (
       const baseUrl = process.env.FRONTEND_BASE_URL as string;
 
       if (existLink) {
-        console.log("Existing link found:", existLink);
-
         const link = `${baseUrl}/brain/${existLink.hash}`;
         sendResponse(res, 200, true, "Here is your link", { link });
         return;
@@ -104,7 +100,6 @@ export const createBrainLink = async (
 
       // Using built-in crypto instead of nanoid
       const hash = generateHash(20);
-      console.log("Generated hash for new link:", hash);
 
       const createLink: createLinkInput = {
         hash,

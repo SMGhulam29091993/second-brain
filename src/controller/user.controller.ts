@@ -255,10 +255,6 @@ export const verifyEmail = async (
     }
     fetchUser.isEmailVerified = true;
     await fetchUser.save();
-    console.log(
-      "Email verified successfully for user:",
-      fetchUser.isEmailVerified
-    );
 
     await Otp.deleteOne({ userId: fetchUser._id });
 
@@ -358,15 +354,12 @@ export const resetPassword = async (
     const { userId } = req.params;
     const { password } = req.body;
 
-    console.log("userId:", userId, "newPassword:", password);
-
     const userData = await User.findById(userId).select("+password");
 
     if (!userData) {
       sendResponse(res, 404, false, "User not found", null);
       return;
     }
-    console.log("User data found:", JSON.stringify(userData));
 
     const isSameOldPassword = await bcryptjs.compare(
       password,

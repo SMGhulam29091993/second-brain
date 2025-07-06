@@ -49,12 +49,21 @@ export const addContent = async (
     // Check if the user has already added this link
     const existingContentForUser = await Content.findOne({ link, userId });
     if (existingContentForUser) {
-      sendResponse(res, 409, false, "Content already exists for this user", existingContentForUser);
+      sendResponse(
+        res,
+        409,
+        false,
+        "Content already exists for this user",
+        existingContentForUser
+      );
       return;
     }
 
     // Check if content with the same link already exists and has a summary
-    const existingContentWithSummary = await Content.findOne({ link, summary: { $exists: true, $ne: "" } });
+    const existingContentWithSummary = await Content.findOne({
+      link,
+      summary: { $exists: true, $ne: "" },
+    });
 
     //saving the content to the database
     const content = await Content.create({
@@ -78,8 +87,6 @@ export const addContent = async (
     } else if (source) {
       try {
         const summary = await generateSummary(source, link);
-        console.log("Generated Summary:", summary);
-
         content.summary = summary;
         await content.save();
       } catch (error) {
@@ -223,7 +230,6 @@ export const getContentSummary = async (
       sendResponse(res, 404, false, "Content not found", null);
       return;
     }
-    console.log("Content Summary:", content.summary);
 
     sendResponse(res, 200, true, "Content summary fetched successfully", {
       summary: content.summary,
