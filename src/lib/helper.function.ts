@@ -14,23 +14,22 @@ import { error } from "winston";
  * @returns The Express `Response` object with the JSON response.
  */
 export const sendResponse = <T>(
-    res: Response, 
-    statusCode: number, 
-    success: boolean, 
-    message: string, 
-    data?: T | null,
-    error?: T | null
+  res: Response,
+  statusCode: number,
+  success: boolean,
+  message: string,
+  data?: T | null,
+  error?: T | null
 ): Response => {
-    const response: ApiResponse<T> = {
-        statusCode,
-        success,
-        message,
-        data: data ?? null, // Ensures `null` if data is undefined or missing
-        error: error ?? null, // Ensures `null` if error is undefined or missing
-    };
-    return res.status(statusCode).json(response);
+  const response: ApiResponse<T> = {
+    statusCode,
+    success,
+    message,
+    data: data ?? null, // Ensures `null` if data is undefined or missing
+    error: error ?? null, // Ensures `null` if error is undefined or missing
+  };
+  return res.status(statusCode).json(response);
 };
-
 
 /**
  * Generates a random 6-character alphanumeric email verification code.
@@ -38,15 +37,16 @@ export const sendResponse = <T>(
  * @returns {string} A randomly generated string consisting of uppercase letters,
  * lowercase letters, and digits.
  */
-export const generateVerifiactionCode = ()=>{
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    for (let i = 0; i < 6; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length);
-        result += characters[randomIndex];
-    }
-    return result;
-}
+export const generateVerifiactionCode = () => {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  for (let i = 0; i < 6; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    result += characters[randomIndex];
+  }
+  return result;
+};
 
 /**
  * Capitalizes the first letter of each word in a given string.
@@ -61,5 +61,9 @@ export const generateVerifiactionCode = ()=>{
  * ```
  */
 export const capitalizeFirstLetter = (input: string) => {
-    return input.toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
-}
+  return input
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
