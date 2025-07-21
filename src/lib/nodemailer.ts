@@ -1,6 +1,6 @@
-import nodemailer from 'nodemailer';
-import winston from 'winston';
-import dotenv from 'dotenv';
+import nodemailer from "nodemailer";
+import winston from "winston";
+import dotenv from "dotenv";
 dotenv.config();
 
 /**
@@ -12,9 +12,9 @@ dotenv.config();
  * This logger can be used throughout the application for consistent logging.
  */
 export const logger = winston.createLogger({
-    level : "debug",
-    format : winston.format.json(),
-    transports : [new winston.transports.Console()],
+  level: "debug",
+  format: winston.format.json(),
+  transports: [new winston.transports.Console()],
 });
 
 /**
@@ -24,7 +24,7 @@ export const logger = winston.createLogger({
  * @param from - The sender's email address.
  * @param subject - The subject of the email.
  * @param htmlTemplate - The HTML content of the email.
- * 
+ *
  * @remarks
  * This function uses the `nodemailer` library to send emails. Ensure that the
  * following environment variables are set for SMTP configuration:
@@ -32,9 +32,9 @@ export const logger = winston.createLogger({
  * - `SMTP_PORT`: The SMTP server port.
  * - `SMTP_USER`: The SMTP username.
  * - `SMTP_PASS`: The SMTP password.
- * 
+ *
  * @throws Will log an error if the email fails to send.
- * 
+ *
  * @example
  * ```typescript
  * await sendMail(
@@ -45,31 +45,35 @@ export const logger = winston.createLogger({
  * );
  * ```
  */
-export const sendMail = async (to : string , from  : string, subject : string, htmlTemplate : string) => {
-    
-    const transport = nodemailer.createTransport({
-        host : process.env.SMTP_HOST,
-        port : Number(process.env.SMTP_PORT),
-        secure : false,
-        auth : {
-            user : process.env.SMTP_USER,
-            pass : process.env.SMTP_PASS,
-        },
-    });
+export const sendMail = async (
+  to: string,
+  from: string,
+  subject: string,
+  htmlTemplate: string
+) => {
+  const transport = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT),
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
 
-    const mailOptions = {
-        from : from,
-        to : to,
-        subject : subject,
-        html : htmlTemplate,
-    };
+  const mailOptions = {
+    from: from,
+    to: to,
+    subject: subject,
+    html: htmlTemplate,
+  };
 
-    logger.debug(`Sending email to ${to} with subject "${subject}"`);
-    await transport.sendMail(mailOptions, (error, info) => {
-        if(error) {
-            logger.error(`Error sending email: ${error}`);
-            return;
-        }
-        logger.info(`Email sent: ${info.response}`);
-    });
-}
+  logger.debug(`Sending email to ${to} with subject "${subject}"`);
+  await transport.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      logger.error(`Error sending email: ${error}`);
+      return;
+    }
+    logger.info(`Email sent: ${info.response}`);
+  });
+};

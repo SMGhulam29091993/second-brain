@@ -28,6 +28,7 @@ db; // Initialize the database connection
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
+  "https://d2nca8ie3zgqh.cloudfront.net",
   process.env.FRONTEND_URL,
 ];
 
