@@ -24,7 +24,7 @@ async function getYouTubeSummary(videoUrl: string): Promise<string> {
     const video = response.data.items[0];
     const textToSummarize = `${video.snippet.title} ${video.snippet.description}`;
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemin-2.5-flash' });
     const result = await model.generateContent(`Please provide a detailed summary of the following content, including all key points and relevant details, in a human-readable format:\n\n${textToSummarize}`);
     return result.response.text();
 }
@@ -43,7 +43,7 @@ async function getTwitterSummary(tweetUrl: string): Promise<string> {
 
     const textToSummarize = response.data.data.text;
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const result = await model.generateContent(`Please provide a detailed summary of the following content, including all key points and relevant details, in a human-readable format:\n\n${textToSummarize}`);
     return result.response.text();
 }
@@ -63,7 +63,7 @@ async function getGitHubSummary(repoUrl: string): Promise<string> {
 
     const textToSummarize = `${response.data.description} ${Buffer.from(readmeResponse.data.content, 'base64').toString()}`;
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const result = await model.generateContent(`Please provide a detailed summary of the following content, including all key points and relevant details, in a human-readable format:\n\n${textToSummarize}`);
     return result.response.text();
 }
