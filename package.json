@@ -9,8 +9,8 @@
   "scripts": {
     "build": "tsc -b",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "SET NODE_ENV=PRODUCTION && node dist/index.js",
-    "dev": "SET NODE_ENV=DEVELOPMENT && nodemon src/index.ts",
+    "start": "NODE_ENV=PRODUCTION && node dist/index.js",
+    "dev": "NODE_ENV=DEVELOPMENT && nodemon src/index.ts",
     "start:prod": "npm run build && npm start"
   },
   "dependencies": {
